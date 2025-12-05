@@ -1,50 +1,64 @@
-function getComputerChoice(){
-    const r = Math.random()
+const buttons = document.querySelectorAll("button")
+const resultsdiv = document.querySelector("#results")
+const score = document.querySelector("#score")
 
-    if (r < 1/3) return 0
-    if (r < 2/3) return 0.5
-    return 1
-}
-
-function getHumanChoice(){
-    const c = prompt('enter your choice : 0 for rock , 0.5 for paper , 1 for scissors')
-    return Number(c)
-}
-
-let humanScore = 0
+let playerScore = 0
 let computerScore = 0
 
-function playRound(){
-    humanChoice = getHumanChoice()
-    computerChoice = getComputerChoice()
+buttons.forEach(button => {
+    button.addEventListener("click",()=>{
 
+        if (playerScore >= 5 || computerScore >= 5) return;
+
+        const playerSelection = button.dataset.choice
+        const round = playRound(playerSelection)
+
+        resultsdiv.textContent = round.message
     
+        if (round.winner === "player") playerScore++
+        else if (round.winner === "computer") computerScore++
+    
+        score.textContent = `player : ${playerScore} - computer : ${computerScore}`
 
-    if (humanChoice === computerChoice){
-        console.log("it's a tie")
-        humanScore++
-        computerScore++
-        return
+        if (playerScore === 5 || computerScore === 5){
+            if (playerScore === 5){
+                resultsdiv.textContent = "🎉 YOU WIN THE GAME! First to 5!"
+            } else{
+                resultsdiv.textContent = "💀 YOU LOST THE GAME! Computer reached 5 first!"
+            }
+
+            buttons.forEach(button => button.disabled = true)
+        }
+    })
+})
+
+
+function playRound(playerSelection){    
+    const choices = ["rock","paper","scissors"]
+    const computerChoice = choices[Math.floor(Math.random()*3)]
+
+    if (playerSelection === computerChoice){
+        return {
+            winner : "draw",
+            message : `draw you both choose ${playerSelection}`
+        }
     }
 
-    if ((humanChoice === 0 && computerChoice === 0.5) || (humanChoice === 0.5 && computerChoice === 1) || (humanChoice === 1 && computerChoice === 0)){
-        console.log('sorry you lose')
-        computerScore++
+    const winningCase = {
+        rock : "scissors",
+        paper : "rock",
+        scissors : "paper"
     }
-    
-    else if ((humanChoice === 0 && computerChoice === 1) || (humanChoice == 0.5 && computerChoice === 0) || (humanChoice === 1 && computerChoice === 0.5)){
-        console.log('you win')
-        humanScore++
+
+    if (winningCase[playerSelection] == computerChoice){
+        return{
+            winner : "player",
+            message : `you win `
+        }
     }
-    
-    console.log(`you : ${humanScore}`)
-    console.log(`computer : ${computerScore}`)
+
+    return{
+        winner : "computer",
+        message : "you lose"
+    }
 }
-
-
-
-playRound()
-playRound()
-playRound()
-playRound()
-playRound()
